@@ -40,17 +40,9 @@ class View(tk.Frame):
     def populateFresh(self):
         buttons = []
         global chests
-        champions = ["Aatrox", "Ahri", "Akali", "Alistar", "Amumu", "Anivia", "Annie", "Ashe", "Aurelion Sol", "Azir", "Bard", "Blitzcrank", "Brand", "Braum", "Caitlyn", "Cassiopeia", "Cho'Gath", "Corki", "Darius", "Diana", "Dr. Mundo", "Draven", "Ekko", "Elise", "Evelynn", "Ezreal", "Fiddlesticks", "Fiora", "Fizz", "Galio", "Gangplank", "Garen", "Gnar", "Gragas", "Graves", "Hecarim", "Heimerdinger", "Illaoi", "Irelia", "Janna", "Jarvan IV", "Jax", "Jayce", "Jhin", "Jinx", "Kalista", "Karma", "Karthus", "Kassadin", "Katarina", "Kayle", "Kennen", "Kha'Zix", "Kindred", "Kled", "Kog'Maw", "LeBlanc", "Lee Sin", "Leona", "Lissandra", "Lucian", "Lulu", "Lux", "Malphite", "Malzahar", "Maokai", "Master Yi", "Miss Fortune", "Mordekaiser", "Morgana", "Nami", "Nasus", "Nautilus", "Nidalee", "Nocturne", "Nunu", "Olaf", "Orianna", "Pantheon", "Poppy", "Quinn", "Rammus", "Rek'Sai", "Renekton", "Rengar", "Riven", "Rumble", "Ryze", "Sejuani", "Shaco", "Shen", "Shyvana", "Singed", "Sion", "Sivir", "Skarner", "Sona", "Soraka", "Swain", "Syndra", "Tahm Kench", "Taliyah", "Talon", "Taric", "Teemo", "Thresh", "Tristana", "Trundle", "Tryndamere", "Twisted Fate", "Twitch", "Udyr", "Urgot", "Varus", "Vayne", "Veigar", "Vel'Koz", "Vi", "Viktor", "Vladimir", "Volibear", "Warwick", "Wukong", "Xerath", "Xin Zhao", "Yasuo", "Yorick", "Zac", "Zed", "Ziggs", "Zilean", "Zyra"]        
         for name in champions:
-            if name == "Wukong":
-                name = "MonkeyKing"
-            if name.find(" ") > 0:
-                name = name.replace(" ", "")
-            if name.find("'") > 0:
-                name = name.replace("'", "")
-            if name.find(".") > 0:
-                name = name.replace(".", "")
-            buttons += [champion(name, False)]
+            name = self.getInternalName(name)
+            buttons += [Champion(name, False)]
             chests += [[name, False]] 
 
         length = math.ceil(len(buttons) / 10)
@@ -61,11 +53,37 @@ class View(tk.Frame):
                     buttons[row * 10 + col].show(self.frame, row, col)
         return buttons
 
+    def getInternalName(self, name):
+        if name == "Wukong":
+            name = "MonkeyKing"
+        if name.find(" ") > 0:
+            name = name.replace(" ", "")
+        if name.find("'") > 0:
+            name = name.replace("'", "")
+        if name.find(".") > 0:
+            name = name.replace(".", "")
+        return name
+
     def populateContinue(self):
         buttons = []
+        foundAtLeastOneNewChampion = False
+        if len(champions) > len(chests):
+            for champ in champions:
+                found = False
+                tempName = self.getInternalName(champ)
+                for chest in chests:
+                    if tempName == chest[0]:
+                        found = True
+                if not found:
+                    #print(champ)
+                    foundAtLeastOneNewChampion = True
+                    chests.append([tempName, False])
+
+        if foundAtLeastOneNewChampion:
+            chests.sort()
+
         for chest in chests:
-            buttons += [champion(chest[0], chest[1])]
-            
+            buttons += [Champion(chest[0], chest[1])]
         length = math.ceil(len(buttons) / 10)
         total = len(buttons)
         for row in range(length):
@@ -87,11 +105,12 @@ class View(tk.Frame):
     def on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
-class champion:
+
+class Champion:
     def __init__(self, name, chest):
         self.name = name
         self.chest = chest
-        self.image = Image.open("C:\\Riot Games\\League of Legends\\RADS\\projects\\lol_air_client\\releases\\0.0.1.212\\deploy\\assets\\images\\champions\\" + name + "_Square_0.png")
+        self.image = Image.open("C:\\Riot Games\\League of Legends\\RADS\\projects\\lol_air_client\\releases\\" + imagesVersion + "\\deploy\\assets\\images\\champions\\" + name + "_Square_0.png")
         self.frameImg = Image.open("frame.png")
         size = 96, 96
         self.image.thumbnail(size)
@@ -152,7 +171,10 @@ def center(win):
 
 if __name__ == "__main__":
     version = "0.9 (alpha)"
+    #imagesVersion = "0.0.1.220"
+    imagesVersion = os.listdir('C:/Riot Games/League of Legends/RADS/projects/lol_air_client/releases')[-1]
     chests = []
+    champions = ["Aatrox", "Ahri", "Akali", "Alistar", "Amumu", "Anivia", "Annie", "Ashe", "Aurelion Sol", "Azir", "Bard", "Blitzcrank", "Brand", "Braum", "Caitlyn", "Cassiopeia", "Cho'Gath", "Corki", "Darius", "Diana", "Dr. Mundo", "Draven", "Ekko", "Elise", "Evelynn", "Ezreal", "Fiddlesticks", "Fiora", "Fizz", "Galio", "Gangplank", "Garen", "Gnar", "Gragas", "Graves", "Hecarim", "Heimerdinger", "Illaoi", "Irelia", "Ivern", "Janna", "Jarvan IV", "Jax", "Jayce", "Jhin", "Jinx", "Kalista", "Karma", "Karthus", "Kassadin", "Katarina", "Kayle", "Kennen", "Kha'Zix", "Kindred", "Kled", "Kog'Maw", "LeBlanc", "Lee Sin", "Leona", "Lissandra", "Lucian", "Lulu", "Lux", "Malphite", "Malzahar", "Maokai", "Master Yi", "Miss Fortune", "Mordekaiser", "Morgana", "Nami", "Nasus", "Nautilus", "Nidalee", "Nocturne", "Nunu", "Olaf", "Orianna", "Pantheon", "Poppy", "Quinn", "Rammus", "Rek'Sai", "Renekton", "Rengar", "Riven", "Rumble", "Ryze", "Sejuani", "Shaco", "Shen", "Shyvana", "Singed", "Sion", "Sivir", "Skarner", "Sona", "Soraka", "Swain", "Syndra", "Tahm Kench", "Taliyah", "Talon", "Taric", "Teemo", "Thresh", "Tristana", "Trundle", "Tryndamere", "Twisted Fate", "Twitch", "Udyr", "Urgot", "Varus", "Vayne", "Veigar", "Vel'Koz", "Vi", "Viktor", "Vladimir", "Volibear", "Warwick", "Wukong", "Xerath", "Xin Zhao", "Yasuo", "Yorick", "Zac", "Zed", "Ziggs", "Zilean", "Zyra"]        
     currentUser = ""
     rootSelect = tk.Tk()
     rootSelect.title("Select user")
